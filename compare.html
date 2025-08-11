@@ -3,93 +3,55 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Comparaison de Compatibilité</title>
+    <title>Comparaison de compatibilité</title>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f0f8ff;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-        }
-        .comparison-table th, .comparison-table td {
-            border: 1px solid #ccc;
-            padding: 12px;
-            text-align: center;
-        }
-        .comparison-table th {
-            background-color: #e0e0ff;
-        }
-        .compatible {
-            background-color: #d4edda;
-        }
-        .incompatible {
-            background-color: #f8d7da;
-        }
-        .question {
-            text-align: left;
-        }
-        .footer {
-            margin-top: 40px;
-            text-align: center;
-            font-size: 1.1em;
-            color: #555;
-        }
+        body { font-family: Arial, sans-serif; background: #f0f8ff; padding: 20px; }
+        h1 { text-align: center; color: #333; }
+        .question { background: #fff; border-radius: 8px; padding: 10px; margin-bottom: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        .compatible { color: green; font-weight: bold; }
+        .non-compatible { color: red; font-weight: bold; }
+        .summary { margin-top: 30px; font-size: 1.2em; text-align: center; }
     </style>
 </head>
 <body>
-    <h1>💞 Résultat de Compatibilité 💞</h1>
-    <table class="comparison-table" id="resultTable">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Question</th>
-                <th>Personne A</th>
-                <th>Personne B</th>
-                <th>Compatibilité</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <div class="footer" id="summary"></div>
-
+    <h1>🔍 Résultat de compatibilité</h1>
+    <div id="comparison"></div>
+    <div class="summary" id="summary"></div>
     <script>
-        const questions = Array.from({length: 50}, (_, i) => `Question ${i + 1} 🤔`);
-        const reponsesA = JSON.parse(localStorage.getItem("reponses_personne_a") || "[]");
-        const reponsesB = JSON.parse(localStorage.getItem("reponses_personne_b") || "[]");
+        document.addEventListener("DOMContentLoaded", function () {
+            const aResponses = JSON.parse(localStorage.getItem("reponses_personne_a") || "[]");
+            const bResponses = JSON.parse(localStorage.getItem("reponses_personne_b") || "[]");
 
-        const tbody = document.querySelector("#resultTable tbody");
-        let compatibleCount = 0;
+            const container = document.getElementById("comparison");
+            const summary = document.getElementById("summary");
+            container.innerHTML = "";
 
-        questions.forEach((question, index) => {
-            const repA = reponsesA[index] || "❓";
-            const repB = reponsesB[index] || "❓";
-            const isCompatible = repA === repB || repA === "À discuter" || repB === "À discuter";
-            const row = document.createElement("tr");
-            row.className = isCompatible ? "compatible" : "incompatible";
+            if (aResponses.length === 0 || bResponses.length === 0) {
+                container.innerHTML = "<p>⚠️ Les réponses de Personne A ou B sont manquantes. Veuillez remplir les questionnaires.</p>";
+                return;
+            }
 
-            if (isCompatible) compatibleCount++;
+            let score = 0;
+            for (let i = 0; i < aResponses.length; i++) {
+                const a = aResponses[i];
+                const b = bResponses[i];
+                const match = a === b || a === "À discuter" || b === "À discuter";
+                if (match) score++;
 
-            row.innerHTML = `
-                <td>${index + 1}</td>
-                <td class="question">${question}</td>
-                <td>${repA}</td>
-                <td>${repB}</td>
-                <td>${isCompatible ? "✅ Compatible" : "❌ Différent"}</td>
-            `;
-            tbody.appendChild(row);
+                const div = document.createElement("div");
+                div.className = "question";
+                div.innerHTML = `
+                    <strong>Question ${i + 1}</strong><br>
+                    👤 Personne A : ${a}<br>
+                    👤 Personne B : ${b}<br>
+                    ${match ? "<span class='compatible'>✔ Compatible</span>" : "<span class='non-compatible'>✘ Non compatible</span>"}
+                `;
+                container.appendChild(div);
+            }
+
+            summary.innerHTML = `💑 Score de compatibilité : <strong>${score} / ${aResponses.length}</strong><br>
+            ${score > 40 ? "🌟 Très compatible !" : score > 25 ? "😊 Moyennement compatible" : "😕 Peu compatible"}`;
         });
-
-        const summary = document.getElementById("summary");
-        summary.innerHTML = `💡 Vous avez ${compatibleCount} réponses compatibles sur 50. ${compatibleCount >= 40 ? "🎉 Très bonne compatibilité !" : compatibleCount >= 25 ? "🙂 Compatibilité moyenne." : "😕 Peu compatible."}`;
     </script>
 </body>
 </html>
