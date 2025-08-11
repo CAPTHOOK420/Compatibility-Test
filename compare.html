@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Comparaison des Réponses</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #f8cdda, #1d2b64);
+            color: #333;
+            padding: 20px;
+        }}
+        .container {{
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }}
+        h1 {{
+            text-align: center;
+        }}
+        ul {{
+            list-style-type: none;
+            padding: 0;
+        }}
+        li {{
+            margin-bottom: 5px;
+        }}
+        .compatible {{ color: green; }}
+        .incompatible {{ color: red; }}
+        .discuter {{ color: orange; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Résultats de Compatibilité</h1>
+        <input type="file" id="fileA" accept=".json">
+        <input type="file" id="fileB" accept=".json">
+        <button onclick="compareResponses()">Comparer</button>
+
+        <h2>✅ Compatibles</h2>
+        <ul id="compatibleList"></ul>
+
+        <h2>❌ Incompatibles</h2>
+        <ul id="incompatibleList"></ul>
+
+        <h2>🗣️ À discuter</h2>
+        <ul id="discuterList"></ul>
+    </div>
+
+    <script>
+        function compareResponses() {{
+            const fileA = document.getElementById('fileA').files[0];
+            const fileB = document.getElementById('fileB').files[0];
+
+            if (!fileA || !fileB) {{
+                alert("Veuillez sélectionner les deux fichiers de réponses.");
+                return;
+            }}
+
+            Promise.all([fileA.text(), fileB.text()]).then(([textA, textB]) => {{
+                const responsesA = JSON.parse(textA);
+                const responsesB = JSON.parse(textB);
+
+                const compatible = [];
+                const incompatible = [];
+                const discuter = [];
+
+                for (let i = 1; i <= 50; i++) {{
+                    const key = 'q' + i;
+                    const a = responsesA[key];
+                    const b = responsesB[key];
+
+                    if (!a || !b) continue;
+
+                    if (a === "À discuter" || b === "À discuter") {{
+                        discuter.push("Question " + i);
+                    }} else if (a === b) {{
+                        compatible.push("Question " + i);
+                    }} else {{
+                        incompatible.push("Question " + i);
+                    }}
+                }}
+
+                document.getElementById('compatibleList').innerHTML = compatible.map(q => `<li class='compatible'>${{q}}</li>`).join('');
+                document.getElementById('incompatibleList').innerHTML = incompatible.map(q => `<li class='incompatible'>${{q}}</li>`).join('');
+                document.getElementById('discuterList').innerHTML = discuter.map(q => `<li class='discuter'>${{q}}</li>`).join('');
+            }});
+        }}
+    </script>
+</body>
+</html>
