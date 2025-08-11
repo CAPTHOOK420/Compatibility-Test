@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Questionnaire - Personne A</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .question { margin-bottom: 10px; }
+        button { margin-top: 20px; padding: 10px 20px; }
+    </style>
+</head>
+<body>
+    <h1>Questionnaire - Personne A</h1>
+    <form id="questionnaire">
+        <div id="questions"></div>
+        <button type="button" onclick="valider()">Valider et voir la compatibilité</button>
+    </form>
+
+    <script>
+        const questionsContainer = document.getElementById('questions');
+        for (let i = 1; i <= 50; i++) {
+            const div = document.createElement('div');
+            div.className = 'question';
+            div.innerHTML = `
+                <label>Question ${i} :</label><br>
+                <input type="radio" name="q${i}" value="Oui"> Oui
+                <input type="radio" name="q${i}" value="Non"> Non
+                <input type="radio" name="q${i}" value="À discuter"> À discuter
+            `;
+            questionsContainer.appendChild(div);
+        }
+
+        function valider() {
+            const reponses = {};
+            for (let i = 1; i <= 50; i++) {
+                const radios = document.getElementsByName('q' + i);
+                for (const radio of radios) {
+                    if (radio.checked) {
+                        reponses['q' + i] = radio.value;
+                        break;
+                    }
+                }
+            }
+            localStorage.setItem('reponses_personne_a', JSON.stringify(reponses));
+            window.location.href = 'compare.html';
+        }
+    </script>
+</body>
+</html>
